@@ -20,7 +20,7 @@ app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', 'admin123')
 db.init_app(app)
 
 # Import routes after db initialization to avoid circular imports
-from Tracker.routes import admin_routes, attendance_routes, auth_routes
+from routes import admin_routes, attendance_routes, auth_routes
 
 # Register blueprints
 
