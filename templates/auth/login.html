@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Teacher Attendance System{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        min-height: 100vh;
+        background: linear-gradient(-45deg, #1e3c72, #2a5298, #6dd5ed, #2193b0);
+        background-size: 400% 400%;
+        animation: gradientBG 12s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    .login-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+    .login-card .card-header {
+        border-radius: 1.5rem 1.5rem 0 0;
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+        box-shadow: 0 2px 8px rgba(30,60,114,0.15);
+    }
+    .login-card .card-footer {
+        border-radius: 0 0 1.5rem 1.5rem;
+    }
+    .login-card input:focus {
+        box-shadow: 0 0 0 2px #2193b0;
+        border-color: #2193b0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 login-card">
+            <div class="card-header bg-primary text-white text-center">
+                <h3 class="mb-0"><i class="fas fa-user-shield me-2"></i>Admin Login</h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" autocomplete="off">
+                    <div class="mb-3">
+                        <label for="username" class="form-label"><i class="fas fa-user me-1"></i>Username</label>
+                        <input type="text" class="form-control form-control-lg" id="username" name="username" placeholder="Enter admin username" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label"><i class="fas fa-lock me-1"></i>Password</label>
+                        <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center bg-light">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1" style="color: red;"></i>
+                    <p style="font-family: 'Poppins'; color: red; font-weight: 900;">Any Issues?: </p><strong style="color: rgb(0, 2, 129);">Contact SamTeck Digital Hub</strong> <strong style="color: rgb(0, 2, 129);">Team For Help</strong>
+                </small>
+                <div class="mt-2">
+                    <span>Don't have an account?</span>
+                    <a href="/auth/register" class="btn btn-outline-primary btn-sm ms-2"><i class="fas fa-user-plus me-1"></i>Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

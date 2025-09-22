@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Teacher Attendance System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Error
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+                    <h5>Operation Failed</h5>
+                    <p class="text-muted">{{ message }}</p>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('attendance.attendance_home') }}" class="btn btn-primary">
+                        <i class="fas fa-qrcode me-1"></i>Try Again
+                    </a>
+                    <a href="{{ url_for('attendance.manual_entry') }}" class="btn btn-warning">
+                        <i class="fas fa-keyboard me-1"></i>Manual Entry
+                    </a>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-tachometer-alt me-1"></i>Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

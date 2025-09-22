@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Add Teacher - Teacher Attendance System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user-plus me-2"></i>Add New Teacher
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">
+                            <i class="fas fa-user me-1"></i>Teacher Name *
+                        </label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               required placeholder="Enter teacher's full name">
+                        <div class="form-text">This will be displayed on the attendance system.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">
+                            <i class="fas fa-building me-1"></i>Department
+                        </label>
+                        <select class="form-select" id="department" name="department" required>
+                            <option value="">Select department</option>
+                            <option>KG1</option>
+                            <option>KG2</option>
+                            <option>Basic 1</option>
+                            <option>Basic 2</option>
+                            <option>Basic 3</option>
+                            <option>Basic 4</option>
+                            <option>Basic 5</option>
+                            <option>Basic 6</option>
+                            <option>Basic 7</option>
+                            <option>Basic 8</option>
+                            <option>Basic 9</option>
+                            <option>Kitchen Staff</option>
+                            <option>School Driver</option>
+                            <option>School Accountant</option>
+                            <option>School Director</option>
+                            <option>Creche / Nursery</option>
+                            <option>Cleaner</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">
+                            <i class="fas fa-phone me-1"></i>Phone Number
+                        </label>
+                        <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                               placeholder="Enter phone number (for SMS notification)">
+                        <div class="form-text">Teacher will receive an SMS notification if phone number is provided.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>Email Address
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               placeholder="Enter teacher's email address (optional)">
+                        <div class="form-text">Optional: For future notification features.</div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin.teachers_list') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Add Teacher
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Information Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>What happens next?
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>A unique ID will be automatically generated</li>
+                    <li><i class="fas fa-check text-success me-2"></i>A QR code will be created for the teacher</li>
+                    <li><i class="fas fa-check text-success me-2"></i>The teacher can start using the attendance system immediately</li>
+                    <li><i class="fas fa-check text-success me-2"></i>You can print or share the QR code with the teacher</li>
+                    <li><i class="fas fa-check text-success me-2"></i>If phone number is provided, teacher will receive an SMS notification</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

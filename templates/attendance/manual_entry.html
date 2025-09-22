@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Manual Entry - Teacher Attendance System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-keyboard me-2"></i>Manual Entry
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> Use this option if QR code scanning is not working.
+                </div>
+                
+                <form method="POST" action="{{ url_for('attendance.process_manual') }}">
+                    <div class="mb-3">
+                        <label for="teacher_unique_id" class="form-label">
+                            <i class="fas fa-id-card me-1"></i>Teacher Unique ID *
+                        </label>
+                        <input type="text" class="form-control" id="teacher_unique_id" 
+                               name="teacher_unique_id" required 
+                               placeholder="Enter your unique teacher ID">
+                        <div class="form-text">Enter the 8-character unique ID assigned to you.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-clock me-1"></i>Action *
+                        </label>
+                        <div class="d-grid gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="action" 
+                                       id="check_in" value="check_in" checked>
+                                <label class="form-check-label" for="check_in">
+                                    <i class="fas fa-sign-in-alt text-success me-1"></i>Check In
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="action" 
+                                       id="check_out" value="check_out">
+                                <label class="form-check-label" for="check_out">
+                                    <i class="fas fa-sign-out-alt text-info me-1"></i>Check Out
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>Submit
+                        </button>
+                        <a href="{{ url_for('attendance.attendance_home') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Attendance
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-question-circle me-2"></i>Need Help?
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-clock me-2 text-success"></i><strong>Check-in:</strong> 6:00 AM - 10:00 AM</li>
+                    <li><i class="fas fa-clock me-2 text-info"></i><strong>Check-out:</strong> 2:00 PM - 6:00 PM</li>
+                    <li><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Contact admin if you don't have your unique ID</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Teacher Attendance System{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    {% if category == 'success' and 'Welcome, admin.' in message %}
+      <script>
+        window.addEventListener('DOMContentLoaded', function() {
+          const synth = window.speechSynthesis;
+          let voices = synth.getVoices();
+          let femaleVoice = voices.find(v => v.gender === 'female' || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('google us english'));
+          let utter = new SpeechSynthesisUtterance('Welcome to admin dashboard designed by SamTech Team.');
+          utter.volume = 10;
+          utter.rate = 0.95;
+          utter.pitch = 1.1;
+          if (femaleVoice) utter.voice = femaleVoice;
+          synth.speak(utter);
+        });
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-between mb-4">
+        <h1 class="mb-0">
+            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+        </h1>
+        {% if username %}
+        <span style="background: #fff; color: #007bff; padding: 8px 22px; border-radius: 24px; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: inline-flex; align-items: center; font-size: 1.1em;">
+            <i class="fas fa-user-circle me-2" style="font-size: 1.3em;"></i>
+            {{ username }}
+        </span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Attendance Statistics -->
+<div class="attendance-stats">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <h3>{{ summary.total_records }}</h3>
+            <p>Total Records</p>
+        </div>
+        <div class="col-md-3">
+            <h3 class="status-on-time">{{ summary.on_time_count }}</h3>
+            <p>On Time</p>
+        </div>
+        <div class="col-md-3">
+            <h3 class="status-late">{{ summary.late_count }}</h3>
+            <p>Late</p>
+        </div>
+        <div class="col-md-3">
+            <h3 class="status-absent">{{ summary.absent_count }}</h3>
+            <p>Absent</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.add_teacher') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Add New Teacher
+                    </a>
+                    <a href="{{ url_for('admin.attendance_reports') }}" class="btn btn-info">
+                        <i class="fas fa-chart-bar me-2"></i>View Reports
+                    </a>
+                    <a href="{{ url_for('attendance.attendance_home') }}" class="btn btn-success">
+                        <i class="fas fa-qrcode me-2"></i>Attendance Scanner
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>Today's Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Date:</strong> {{ summary.records[0].date if summary.records else 'No records today' }}</p>
+                <p><strong>Total Teachers:</strong> {{ summary.total_records }}</p>
+                <p><strong>Present:</strong> {{ summary.on_time_count + summary.late_count }}</p>
+                <p><strong>Absent:</strong> {{ summary.absent_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Attendance Records -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>Recent Attendance Records
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_records %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Teacher</th>
+                                <th>Date</th>
+                                <th>Check-in Time</th>
+                                <th>Check-out Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in recent_records %}
+                            <tr>
+                                <td>
+                                    <strong>{{ record.teacher.name }}</strong>
+                                    <br><small class="text-muted">{{ record.teacher.unique_id }}</small>
+                                </td>
+                                <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if record.check_in_time %}
+                                        {{ record.check_in_time.strftime('%I:%M %p') }}
+                                    {% else %}
+                                        <span class="text-muted">Not checked in</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if record.check_out_time %}
+                                        {{ record.check_out_time.strftime('%I:%M %p') }}
+                                    {% else %}
+                                        <span class="text-muted">Not checked out</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if record.status == 'On Time' else 'warning' if record.status == 'Late' else 'danger' }}">
+                                        {{ record.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>No attendance records found.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

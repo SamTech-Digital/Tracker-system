@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}QR Scanner - Teacher Attendance System{% endblock %}
+
+{% block extra_css %}
+<style>
+    #qr-reader {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .scanner-container {
+        text-align: center;
+        padding: 20px;
+    }
+    .action-buttons {
+        margin-top: 20px;
+    }
+    .result-message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+    }
+    .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+    .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-qrcode me-2"></i>QR Code Scanner
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="scanner-container">
+                    <div class="mb-3">
+                        <h5>Select Action:</h5>
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="action" id="check_in" value="check_in" checked>
+                            <label class="btn btn-outline-success" for="check_in">
+                                <i class="fas fa-sign-in-alt me-1"></i>Check In
+                            </label>
+                            <input type="radio" class="btn-check" name="action" id="check_out" value="check_out">
+                            <label class="btn btn-outline-info" for="check_out">
+                                <i class="fas fa-sign-out-alt me-1"></i>Check Out
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div id="qr-reader"></div>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('attendance.manual_entry') }}" class="btn btn-warning">
+                            <i class="fas fa-keyboard me-1"></i>Manual Entry
+                        </a>
+                    </div>
+                    <div id="result-message" class="result-message" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Instructions
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Allow camera access when prompted</li>
+                    <li>Select whether you want to check in or check out</li>
+                    <li>Hold your QR code in front of the camera</li>
+                    <li>The system will automatically detect and process your QR code</li>
+                    <li>If scanning fails, use the "Manual Entry" option</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+function playAudio(type, message) {
+    const synth = window.speechSynthesis;
+    let voices = synth.getVoices();
+    let femaleVoice = voices.find(v => v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('google us english') || v.gender === 'female');
+    let utter;
+    if (type === 'success') {
+        let text = message || 'Welcome! Have a great day!';
+        utter = new SpeechSynthesisUtterance(text);
+    } else if (type === 'error') {
+        let text = 'Please try to use your manual entry code to verify. Thank you.';
+        utter = new SpeechSynthesisUtterance(text);
+    }
+    utter.rate = 1.05;
+    if (femaleVoice) utter.voice = femaleVoice;
+    synth.speak(utter);
+}
+
+function showMessage(message, type) {
+    const resultDiv = document.getElementById('result-message');
+    resultDiv.textContent = message;
+    resultDiv.className = `result-message ${type}`;
+    resultDiv.style.display = 'block';
+    setTimeout(() => {
+        resultDiv.style.display = 'none';
+    }, 5000);
+}
+
+function processQRCode(qrData, action) {
+    const formData = new FormData();
+    formData.append('qr_data', qrData);
+    formData.append('action', action);
+    fetch('/attendance/process-qr', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(data.message, 'success');
+            playAudio('success', data.message);
+            setTimeout(() => {
+                document.getElementById('result-message').style.display = 'none';
+                window.lastScanned = '';
+            }, 2500);
+        } else {
+            showMessage(data.message, 'error');
+            playAudio('error', data.message);
+        }
+    })
+    .catch(error => {
+        showMessage('Error processing QR code. Please try again.', 'error');
+        playAudio('error', '');
+    });
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    window.lastScanned = '';
+    const qrReader = new Html5Qrcode("qr-reader");
+    const config = { fps: 10, qrbox: 250 };
+    qrReader.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText, decodedResult) => {
+            if (decodedText && decodedText !== window.lastScanned) {
+                window.lastScanned = decodedText;
+                const action = document.querySelector('input[name="action"]:checked').value;
+                processQRCode(decodedText, action);
+            }
+        },
+        (errorMessage) => {
+            // Optionally show camera errors
+        }
+    ).catch(err => {
+        showMessage('Unable to access camera. Please use manual entry.', 'error');
+        playAudio('error', '');
+    });
+});
+</script>
+{% endblock %} 

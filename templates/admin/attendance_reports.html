@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Reports - Teacher Attendance System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-chart-bar me-2"></i>Attendance Reports
+        </h1>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-filter me-2"></i>Filters
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date" 
+                       value="{{ filters.date or '' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="teacher" class="form-label">Teacher</label>
+                <select class="form-select" id="teacher" name="teacher">
+                    <option value="">All Teachers</option>
+                    {% for teacher in teachers %}
+                    <option value="{{ teacher.unique_id }}" 
+                            {{ 'selected' if filters.teacher == teacher.unique_id }}>
+                        {{ teacher.name }} ({{ teacher.unique_id }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">All Status</option>
+                    <option value="On Time" {{ 'selected' if filters.status == 'On Time' }}>On Time</option>
+                    <option value="Late" {{ 'selected' if filters.status == 'Late' }}>Late</option>
+                    <option value="Absent" {{ 'selected' if filters.status == 'Absent' }}>Absent</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">{{ summary.total_records }}</h3>
+                <p class="card-text">Total Records</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">{{ summary.on_time_count }}</h3>
+                <p class="card-text">On Time</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-warning">{{ summary.late_count }}</h3>
+                <p class="card-text">Late</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-danger">{{ summary.absent_count }}</h3>
+                <p class="card-text">Absent</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Records Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-table me-2"></i>Attendance Records
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if summary.records %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Teacher</th>
+                        <th>Date</th>
+                        <th>Check-in Time</th>
+                        <th>Check-out Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in summary.records %}
+                    <tr>
+                        <td>
+                            <strong>{{ record.teacher_name }}</strong>
+                            <br><small class="text-muted">{{ record.teacher_unique_id }}</small>
+                        </td>
+                        <td>{{ record.date }}</td>
+                        <td>
+                            {% if record.check_in_time %}
+                                {{ record.check_in_time.split('T')[1][:5] }}
+                            {% else %}
+                                <span class="text-muted">Not checked in</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.check_out_time %}
+                                {{ record.check_out_time.split('T')[1][:5] }}
+                            {% else %}
+                                <span class="text-muted">Not checked out</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if record.status == 'On Time' else 'warning' if record.status == 'Late' else 'danger' }}">
+                                {{ record.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info" 
+                                    onclick="viewDetails({{ record.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <h5>No Records Found</h5>
+            <p class="text-muted">No attendance records match your current filters.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="text-center mt-4">
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary me-2">
+        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+    </a>
+    <button class="btn btn-outline-success me-2" onclick="exportToCSV()">
+        <i class="fas fa-download me-1"></i>Export to CSV
+    </button>
+    <button class="btn btn-outline-primary" onclick="printReport()">
+        <i class="fas fa-print me-1"></i>Print Report
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewDetails(recordId) {
+    // Implement detailed view functionality
+    alert('Detailed view for record ' + recordId + ' - Feature coming soon!');
+}
+
+function exportToCSV() {
+    // Implement CSV export functionality
+    alert('CSV export feature coming soon!');
+}
+
+function printReport() {
+    window.print();
+}
+</script>
+{% endblock %} 

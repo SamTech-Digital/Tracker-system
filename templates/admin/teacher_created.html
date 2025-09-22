@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Created - Teacher Attendance System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-check-circle me-2"></i>Teacher Created Successfully!
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-success">
+                    <h5><i class="fas fa-user-check me-2"></i>{{ teacher.name }}</h5>
+                    <p class="mb-0">has been added to the attendance system.</p>
+                </div>
+                
+                <!-- Notification Results -->
+                {% if email_result or sms_result %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="text-muted mb-3">Notification Status:</h6>
+                        <div class="row">
+                            {% if email_result %}
+                            <div class="col-md-6">
+                                <div class="card {% if email_result.success %}border-success{% else %}border-danger{% endif %}">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-envelope fa-2x {% if email_result.success %}text-success{% else %}text-danger{% endif %} me-3"></i>
+                                            <div class="text-start">
+                                                <h6 class="mb-1">Email Notification</h6>
+                                                {% if email_result.success %}
+                                                <p class="text-success mb-0 small">
+                                                    <i class="fas fa-check me-1"></i>Sent successfully
+                                                </p>
+                                                {% else %}
+                                                <p class="text-danger mb-0 small">
+                                                    <i class="fas fa-times me-1"></i>{{ email_result.error }}
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if sms_result %}
+                            <div class="col-md-6">
+                                <div class="card {% if sms_result.success %}border-success{% else %}border-danger{% endif %}">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-sms fa-2x {% if sms_result.success %}text-success{% else %}text-danger{% endif %} me-3"></i>
+                                            <div class="text-start">
+                                                <h6 class="mb-1">SMS Notification</h6>
+                                                {% if sms_result.success %}
+                                                <p class="text-success mb-0 small">
+                                                    <i class="fas fa-check me-1"></i>Sent successfully
+                                                </p>
+                                                {% else %}
+                                                <p class="text-danger mb-0 small">
+                                                    <i class="fas fa-times me-1"></i>{{ sms_result.error }}
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-id-card me-2"></i>Teacher Information
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Name:</strong> {{ teacher.name }}</p>
+                                <p><strong>Unique ID:</strong> <code>{{ teacher.unique_id }}</code></p>
+                                {% if teacher.email %}
+                                <p><strong>Email:</strong> {{ teacher.email }}</p>
+                                {% endif %}
+                                {% if teacher.phone_number %}
+                                <p><strong>Phone:</strong> {{ teacher.phone_number }}</p>
+                                {% endif %}
+                                <p><strong>Created:</strong> {{ teacher.created_at.strftime('%Y-%m-%d %I:%M %p') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-qrcode me-2"></i>QR Code
+                                </h6>
+                            </div>
+                            <div class="card-body qr-code-container">
+                                <img src="{{ qr_data_url }}" alt="QR Code for {{ teacher.name }}" 
+                                     class="img-fluid" style="max-width: 200px;">
+                                <p class="mt-2"><small class="text-muted">Scan this QR code for attendance</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Next Steps:</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-print fa-2x text-primary mb-2"></i>
+                                <p><strong>Print QR Code</strong></p>
+                                <p class="text-muted small">Print and give to the teacher</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-mobile-alt fa-2x text-success mb-2"></i>
+                                <p><strong>Save to Phone</strong></p>
+                                <p class="text-muted small">Teacher can save QR code image</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-qrcode fa-2x text-info mb-2"></i>
+                                <p><strong>Test Attendance</strong></p>
+                                <p class="text-muted small">Try scanning at attendance station</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('admin.teachers_list') }}" class="btn btn-secondary me-2">
+                        <i class="fas fa-users me-1"></i>View All Teachers
+                    </a>
+                    <a href="{{ url_for('admin.add_teacher') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-plus me-1"></i>Add Another Teacher
+                    </a>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-success">
+                        <i class="fas fa-tachometer-alt me-1"></i>Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
