@@ -236,17 +236,17 @@ class AttendanceLogic:
     def get_attendance_summary(date_filter=None, teacher_filter=None, status_filter=None):
         """
         Get attendance summary with optional filters
-        
         Args:
             date_filter (str): Date filter (YYYY-MM-DD)
             teacher_filter (str): Teacher name or ID filter
             status_filter (str): Status filter (On Time, Late, Absent)
-            
         Returns:
             dict: Summary statistics and filtered records
         """
-        query = Attendance.query.join(Teacher)
-        
+        from flask import session
+        user_id = session.get('user_id')
+        query = Attendance.query.join(Teacher).filter(Teacher.user_id == user_id)
+
         # Apply filters
         if date_filter:
             try:
@@ -254,29 +254,29 @@ class AttendanceLogic:
                 query = query.filter(Attendance.date == filter_date)
             except ValueError:
                 pass
-        
+
         if teacher_filter:
             query = query.filter(
                 (Teacher.name.ilike(f'%{teacher_filter}%')) |
                 (Teacher.unique_id.ilike(f'%{teacher_filter}%'))
             )
-        
+
         if status_filter:
             query = query.filter(Attendance.status == status_filter)
-        
+
         # Get records
         records = query.order_by(Attendance.date.desc(), Attendance.check_in_time.desc()).all()
-        
+
         # Calculate summary
         total_records = len(records)
         on_time_count = sum(1 for r in records if r.status == 'On Time')
         late_count = sum(1 for r in records if r.status == 'Late')
         absent_count = sum(1 for r in records if r.status == 'Absent')
-        
+
         return {
             'total_records': total_records,
             'on_time_count': on_time_count,
             'late_count': late_count,
             'absent_count': absent_count,
             'records': [record.to_dict() for record in records]
-        } 
+        }

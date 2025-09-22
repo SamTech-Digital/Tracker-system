@@ -295,3 +295,19 @@ For issues and questions:
 ---
 
 **Built with ❤️ using Python Flask** 
+
+
+---
+1. Push Your Changes to GitHub (on your local machine)
+Open PowerShell in your project folder and run:
+
+git add .
+git commit -m "Your commit message"
+git push origin main
+
+Make changes to your code locally.
+Commit and push changes to your GitHub repo.
+On PythonAnywhere, open a Bash console and pull the latest changes:
+"cd ~/Tracker-system
+git pull"
+then reload webapp on pythonanywhere.
