@@ -21,9 +21,9 @@ def dashboard():
     today = date.today()
     # Get today's attendance summary
     summary = AttendanceLogic.get_attendance_summary(date_filter=today.strftime('%Y-%m-%d'))
-    # Get recent attendance records
-    recent_records = Attendance.query.join(Teacher).order_by(
-        Attendance.date.desc(), 
+    # Get recent attendance records for teachers added by this user
+    recent_records = Attendance.query.join(Teacher).filter(Teacher.user_id == session.get('user_id')).order_by(
+        Attendance.date.desc(),
         Attendance.check_in_time.desc()
     ).limit(10).all()
     from models import User
